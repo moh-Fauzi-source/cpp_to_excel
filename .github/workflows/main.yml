@@ -1,0 +1,41 @@
+name: C++ to Excel
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Mengambil kode repository
+        uses: actions/checkout@v4
+
+      - name: Memasang compiler dan library Excel
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ libxlsxwriter-dev
+
+      - name: Mengompilasi program C++
+        run: |
+          g++ -std=c++17 main.cpp -o main -lxlsxwriter
+          
+      - name: Menjalankan program C++
+        run: |
+          ./main
+          test -s hasil.xlsx
+
+      - name: Mengunggah file Excel
+        uses: actions/upload-artifact@v4
+        with:
+          name: hasil-excel
+          path: hasil.xlsx
+          if-no-files-found: error
+          retention-days: 7
+          
